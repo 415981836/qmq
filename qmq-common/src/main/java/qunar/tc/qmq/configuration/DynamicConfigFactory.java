@@ -17,9 +17,19 @@
 package qunar.tc.qmq.configuration;
 
 /**
+ * DynamicConfig的工厂类
+ */
+
+/**
  * @author keli.wang
  * @since 2018-11-23
  */
 public interface DynamicConfigFactory {
+    /**
+     * 创建DynamicConfig
+     * @param name
+     * @param failOnNotExist
+     * @return
+     */
     DynamicConfig create(String name, boolean failOnNotExist);
 }

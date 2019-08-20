@@ -23,15 +23,23 @@ import qunar.tc.qmq.configuration.DynamicConfigLoader;
 import qunar.tc.qmq.meta.web.*;
 
 /**
+ * notk
+ * qmq服务端启动类
+ * 从metaserver.sh中的启动类
+ */
+
+
+/**
  * @author keli.wang
  * @since 2018-12-04
  */
 public class Bootstrap {
     public static void main(String[] args) throws Exception {
         final ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+
         context.setContextPath("/");
-        context.setResourceBase(System.getProperty("java.io.tmpdir"));
-        DynamicConfig config = DynamicConfigLoader.load("metaserver.properties");
+        context.setResourceBase(System.getProperty("java.io.tmpdir"));  //java.io.tmpdir默认的路径在/tmp下
+        DynamicConfig config = DynamicConfigLoader.load("metaserver.properties"); //qmq-dist/conf
         final ServerWrapper wrapper = new ServerWrapper(config);
         wrapper.start(context.getServletContext());
 

@@ -17,9 +17,19 @@
 package qunar.tc.qmq.configuration;
 
 /**
+ * notk
+ * 监听器
+ * 现在都是提供的匿名实现类
+ */
+
+/**
  * @author keli.wang
  * @since 2018-11-27
  */
 public interface Listener {
+    /**
+     * 加载动态配置
+     * @param config
+     */
     void onLoad(DynamicConfig config);
 }

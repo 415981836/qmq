@@ -21,6 +21,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
+ * notk
+ * ConsumerGroup用于记录主题和分组
+ */
+
+
+/**
  * @author yunfeng.yang
  * @since 2017/7/6
  */
@@ -29,6 +35,13 @@ public class ConsumerGroup {
     private final String subject;
     private final String group;
 
+    /**
+     * Json反序列化时，默认选择无参构造函数，如果没有，则报错
+     * JsonCreator则是指定Json反序列化时的构造对象的方法
+     * 参数前必须带上JsonProperty的注解，不然报错
+     * @param subject
+     * @param group
+     */
     @JsonCreator
     public ConsumerGroup(@JsonProperty("subject") String subject,
                          @JsonProperty("group") String group) {

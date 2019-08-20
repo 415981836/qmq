@@ -19,6 +19,11 @@ package qunar.tc.qmq.configuration;
 import java.util.Map;
 
 /**
+ * notk
+ * 动态配置
+ */
+
+/**
  * User: zhaohuiyu Date: 12/24/12 Time: 4:12 PM
  */
 public interface DynamicConfig {
@@ -38,11 +43,33 @@ public interface DynamicConfig {
 
     double getDouble(String name);
 
+    /**
+     * 获取double
+     * @param name
+     * @param defaultValue
+     * @return
+     */
     double getDouble(String name, double defaultValue);
 
+    /**
+     * 如果不存在，返回默认值
+     * 否则返回获取的true或false
+     * @param name
+     * @param defaultValue
+     * @return
+     */
     boolean getBoolean(String name, boolean defaultValue);
 
+    /**
+     * 是否包含该配置
+     * @param name
+     * @return
+     */
     boolean exist(String name);
 
+    /**
+     * 获取配置的Map结构
+     * @return
+     */
     Map<String, String> asMap();
 }

@@ -2,25 +2,33 @@
 set -euo pipefail
 
 QMQ_BIN="${BASH_SOURCE-$0}"
+#获取文件夹名称（去掉了最近一层的文件夹路径）
 QMQ_BIN="$(dirname "$QMQ_BIN")"
+#打印出文件路径
 QMQ_BIN_DIR="$(cd "$QMQ_BIN"; pwd)"
+#获取启动类完全路径
 QMQ_META_MAIN="qunar.tc.qmq.meta.startup.Bootstrap"
 
+#重新加载文件到内存（这里主要是加载两个文件中的环境变量）
 . "$QMQ_BIN_DIR/base.sh"
 . "$QMQ_BIN_DIR/metaserver-env.sh"
 
+#获取java的路径
 if [[ "$JAVA_HOME" != "" ]]; then
   JAVA="$JAVA_HOME/bin/java"
 else
   JAVA=java
 fi
 
+#设置JAVA_OPTS的启动参数
 JAVA_OPTS="$JAVA_OPTS -DQMQ_LOG_DIR=$QMQ_LOG_DIR -Xloggc:${QMQ_LOG_DIR}/metaserver-gc-${TIMESTAMP}.log -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${QMQ_LOG_DIR}"
 QMQ_PID_FILE="$QMQ_PID_DIR/metaserver.pid"
 QMQ_DAEMON_OUT="$QMQ_LOG_DIR/metaserver.out"
 
+#根据不同的参数，进行条件判断
 CMD=${1:-}
 case ${CMD} in
+#开始
 start)
     echo  -n "Starting qmq meta server ... "
     if [[ -f "$QMQ_PID_FILE" ]]; then
@@ -50,6 +58,7 @@ start-foreground)
     ZOO_CMD=(exec "$JAVA")
     "${ZOO_CMD[@]}" -cp "$CLASSPATH" ${JAVA_OPTS} ${QMQ_META_MAIN}
     ;;
+#停止
 stop)
     echo -n "Stopping qmq meta server ... "
     if [[ ! -f "$QMQ_PID_FILE" ]]
@@ -62,6 +71,7 @@ stop)
     fi
     exit 0
     ;;
+#其他
 *)
     echo "Usage: $0 {start|start-foreground|stop}" >&2
 esac

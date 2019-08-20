@@ -29,36 +29,69 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
+ * 本地动态配置类
  * @author keli.wang
  * @since 2018-11-23
  */
 public class LocalDynamicConfig implements DynamicConfig {
     private static final Logger LOG = LoggerFactory.getLogger(LocalDynamicConfig.class);
 
+    /**
+     * 配置名称
+     */
     private final String name;
     private final CopyOnWriteArrayList<Listener> listeners;
+    /**
+     * 配置文件实例（加载文件是根据confDir文件夹路径+文件名处理的）
+     */
     private volatile File file;
+    /**
+     * 是否加载
+     */
     private volatile boolean loaded = false;
+    /**
+     * 配置项的内容
+     */
     private volatile Map<String, String> config;
-
+    /**
+     * QMQ的配置文件的目录路径
+     */
     private final String confDir;
 
+    /**
+     * LocalDynamicConfig初始化
+     * @param name
+     * @param failOnNotExist
+     */
     LocalDynamicConfig(String name, boolean failOnNotExist) {
         this.name = name;
         this.listeners = new CopyOnWriteArrayList<>();
         this.config = new HashMap<>();
         this.confDir = System.getProperty("qmq.conf");
         this.file = getFileByName(name);
-
+        /**
+         * 如果配置文件不存在，并且failOnNotExist为true，则抛出异常
+         */
         if (failOnNotExist && (file == null || !file.exists())) {
             throw new RuntimeException("cannot find config file " + name);
         }
     }
 
+    /**
+     * 获取配置文件
+     * @param name
+     * @return
+     */
     private File getFileByName(final String name) {
+        /**
+         * 如果有配置文件目录，则从该目录中取
+         */
         if (confDir != null && confDir.length() > 0) {
             return new File(confDir, name);
         }
+        /**
+         * 目录为空，则根据Resource来取
+         */
         try {
             final URL res = this.getClass().getClassLoader().getResource(name);
             if (res == null) {
@@ -70,6 +103,11 @@ public class LocalDynamicConfig implements DynamicConfig {
         }
     }
 
+    /**
+     * 获取配置文件File的最后修改时间
+     * 用于监听文件变化
+     * @return
+     */
     long getLastModified() {
         if (file == null) {
             file = getFileByName(name);
@@ -82,16 +120,28 @@ public class LocalDynamicConfig implements DynamicConfig {
         }
     }
 
+    /**
+     * 配置文件变化时，重新加载
+     */
     synchronized void onConfigModified() {
         if (file == null) {
             return;
         }
-
+        /**
+         * 加载数据，得到Map
+         */
         loadConfig();
+        /**
+         * 执行Listener监听器
+         */
         executeListeners();
         loaded = true;
     }
 
+    /**
+     * 从配置文件中加载数据，并转换为Map
+     * 使用Properties实现读取
+     */
     private void loadConfig() {
         try {
             final Properties p = new Properties();
@@ -131,6 +181,10 @@ public class LocalDynamicConfig implements DynamicConfig {
         listeners.add(listener);
     }
 
+    /**
+     * 执行监听器
+     * @param listener
+     */
     private void executeListener(Listener listener) {
         try {
             listener.onLoad(this);
@@ -213,6 +267,11 @@ public class LocalDynamicConfig implements DynamicConfig {
         return config.get(name);
     }
 
+    /**
+     * 判断是否为空或者为空格
+     * @param s
+     * @return
+     */
     private boolean isBlank(final String s) {
         if (s == null || s.isEmpty()) {
             return true;

@@ -17,6 +17,12 @@
 package qunar.tc.qmq.common;
 
 /**
+ * notk
+ * 销毁接口
+ * 提供destroy方法执行销毁业务
+ */
+
+/**
  * User: zhaohuiyu
  * Date: 7/24/13
  * Time: 3:17 PM

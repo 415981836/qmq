@@ -31,17 +31,31 @@ import java.util.concurrent.TimeUnit;
  */
 class ConfigWatcher {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigWatcher.class);
-
+    /**
+     * 这个ConfigWatcher持有的监视器
+     */
     private final CopyOnWriteArrayList<Watch> watches;
+    /**
+     * 线程池
+     */
     private final ScheduledExecutorService watcherExecutor;
 
     ConfigWatcher() {
+        /**
+         * 初始化watches
+         */
         this.watches = new CopyOnWriteArrayList<>();
+        /**
+         * 初始化线程池
+         */
         this.watcherExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("local-config-watcher"));
 
         start();
     }
 
+    /**
+     * 启动线程，扫描配置文件的变化
+     */
     private void start() {
         watcherExecutor.scheduleWithFixedDelay(new Runnable() {
             @Override
@@ -51,6 +65,9 @@ class ConfigWatcher {
         }, 10, 10, TimeUnit.SECONDS);
     }
 
+    /**
+     * 对ConfigWatcher中持有的对配置文件的Watch进行加载
+     */
     private void checkAllWatches() {
         for (Watch watch : watches) {
             try {
@@ -61,6 +78,11 @@ class ConfigWatcher {
         }
     }
 
+    /**
+     * 检查Config中的修改时间与Watch监视的修改时间进行对比
+     * 如果不同，则更新Watch中的修改时间，并重新加载Config
+     * @param watch
+     */
     private void checkWatch(final Watch watch) {
         final LocalDynamicConfig config = watch.getConfig();
         final long lastModified = config.getLastModified();
@@ -72,14 +94,27 @@ class ConfigWatcher {
         config.onConfigModified();
     }
 
+    /**
+     * 添加监视器
+     * @param config
+     */
     void addWatch(final LocalDynamicConfig config) {
         final Watch watch = new Watch(config);
         watch.setLastModified(config.getLastModified());
         watches.add(watch);
     }
 
+    /**
+     * 内部实现类watch
+     */
     private static final class Watch {
+        /**
+         * 配置
+         */
         private final LocalDynamicConfig config;
+        /**
+         * 修改时间点
+         */
         private volatile long lastModified;
 
         private Watch(final LocalDynamicConfig config) {
